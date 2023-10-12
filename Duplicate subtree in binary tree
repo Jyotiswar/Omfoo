@@ -1,0 +1,92 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+
+using namespace std;
+
+// Define the Node structure
+struct Node {
+    int data;
+    Node* left;
+    Node* right;
+    Node(int val) : data(val), left(nullptr), right(nullptr) {}
+};
+
+bool same(Node* x, Node* y) {
+    if ((x == nullptr) ^ (y == nullptr))
+        return false;
+    if (x == nullptr && y == nullptr)
+        return true;
+
+    if (x->data != y->data)
+        return false;
+
+    return same(x->left, y->left) && same(x->right, y->right);
+}
+
+class Solution {
+public:
+    /*This function returns true if the tree contains 
+    a duplicate subtree of size 2 or more else returns false*/
+    int dupSub(Node* root) {
+        vector<Node*> nodes;
+
+        queue<Node*> q;
+        q.push(root);
+
+        while (!q.empty()) {
+            Node* cur = q.front();
+            q.pop();
+
+            bool leaf = true;
+
+            if (cur->left != nullptr) {
+                q.push(cur->left);
+                leaf = false;
+            }
+            if (cur->right != nullptr) {
+                q.push(cur->right);
+                leaf = false;
+            }
+
+            if (!leaf)
+                nodes.push_back(cur);
+        }
+
+        for (int i = 0; i < nodes.size(); i++) {
+            for (int j = i + 1; j < nodes.size(); j++) {
+                if (same(nodes[i], nodes[j]))
+                    return 1;
+            }
+        }
+
+        return 0;
+    }
+};
+
+int main() {
+    // Create a sample binary tree
+    Node* root = new Node(1);
+    root->left = new Node(2);
+    root->right = new Node(3);
+    root->left->left = new Node(4);
+    root->left->right = new Node(5);
+
+    // Constructing duplicate subtree
+    root->left->left->left = new Node(6);
+    root->left->left->right = new Node(7);
+
+    Solution solution;
+
+    int result = solution.dupSub(root);
+
+    if (result == 1) {
+        cout << "The tree contains duplicate subtrees." << endl;
+    } else {
+        cout << "The tree does not contain duplicate subtrees." << endl;
+    }
+
+    // You should add memory cleanup to delete the dynamically allocated nodes here.
+
+    return 0;
+}
